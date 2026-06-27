@@ -1,35 +1,26 @@
-name: Deploy to EC2 Ubuntu
+name: Deploy to Remote Server via SSH
 
 on:
   push:
     branches:
-      - main  # Triggers the pipeline when code is pushed to the main branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Execute remote SSH commands to deploy
+      # Log into your server and run automated shell scripts securely
+      - name: Execute Remote SSH Commands
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
           script: |
-            # Navigate to your project directory
-            cd /var/www/html/your-project-directory
-
-            # Fetch the latest code from GitHub
+            cd /var/www/my-app
             git pull origin main
-
-            # Install dependencies (Example for Node.js, adjust for your stack)
-            # npm install --production
-
-            # Restart your app/service (Example for PM2, Docker, or systemd)
-            # pm2 restart all
-
+            npm install --production
+            pm2 restart all
